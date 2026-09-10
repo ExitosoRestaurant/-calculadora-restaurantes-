@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¿Tu plato estrella te deja ganancias o pérdidas?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f5f5f0;
+    color: #1a1a1a;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+  .card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+    border: 1px solid #e5e5e0;
+  }
+  .logo-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f0f0eb;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: #1a1a1a;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-icon svg { width: 20px; height: 20px; fill: #ffffff; }
+  .logo-text { font-size: 13px; font-weight: 500; color: #666; }
+  h1 { font-size: 20px; font-weight: 600; color: #1a1a1a; margin-bottom: 6px; line-height: 1.3; }
+  .subtitle { font-size: 14px; color: #666; margin-bottom: 1.75rem; line-height: 1.5; }
+  .sec-label {
+    font-size: 11px; font-weight: 600; color: #999;
+    letter-spacing: .07em; text-transform: uppercase;
+    margin: 1.25rem 0 .75rem;
+  }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 13px; font-weight: 500; color: #444; }
+  .field-hint { font-size: 11px; color: #999; }
+  .iw { position: relative; }
+  .iw .pre { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #999; pointer-events: none; }
+  .iw .suf { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #999; pointer-events: none; }
+  input[type="number"], input[type="text"] {
+    width: 100%;
+    height: 40px;
+    border: 1px solid #e0e0db;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1a1a1a;
+    background: #fafafa;
+    padding: 0 12px;
+    transition: border-color .15s;
+    font-family: 'Inter', sans-serif;
+  }
+  input:focus { outline: none; border-color: #1a1a1a; background: #fff; }
+  .iw.has-pre input { padding-left: 24px; }
+  .iw.has-suf input { padding-right: 30px; }
+  .err { font-size: 12px; color: #c0392b; margin-top: 3px; display: none; }
+  .btn-calc {
+    width: 100%; padding: 13px;
+    font-size: 15px; font-weight: 600;
+    margin-top: 1.25rem; cursor: pointer;
+    background: #1a1a1a; color: #ffffff;
+    border: none; border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    transition: opacity .15s;
+  }
+  .btn-calc:hover { opacity: .85; }
+  .results { margin-top: 1.75rem; display: none; }
+  .breakdown {
+    background: #f8f8f5;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 1rem;
+    border: 1px solid #ececе7;
+  }
+  .bd-title { font-size: 13px; font-weight: 600; color: #444; margin-bottom: 10px; }
+  .bd-row { display: flex; justify-content: space-between; font-size: 13px; color: #666; padding: 3px 0; }
+  .bd-row.total {
+    border-top: 1px solid #e0e0db;
+    margin-top: 8px; padding-top: 10px;
+    font-weight: 600; color: #1a1a1a; font-size: 14px;
+  }
+  .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+  .metric { background: #f8f8f5; border-radius: 10px; padding: 14px 16px; border: 1px solid #ececе7; }
+  .metric-label { font-size: 12px; color: #888; margin-bottom: 4px; }
+  .metric-value { font-size: 24px; font-weight: 600; color: #1a1a1a; }
+  .metric-value.verde { color: #27ae60; }
+  .metric-value.amarillo { color: #e67e22; }
+  .metric-value.rojo { color: #c0392b; }
+  .semaforo { border-radius: 12px; padding: 18px 20px; margin-bottom: 1rem; }
+  .semaforo.verde { background: #eafaf1; border: 1px solid #a9dfbf; }
+  .semaforo.amarillo { background: #fef9e7; border: 1px solid #f9e79f; }
+  .semaforo.rojo { background: #fdedec; border: 1px solid #f5b7b1; }
+  .sem-title { font-size: 15px; font-weight: 600; margin-bottom: 5px; }
+  .semaforo.verde .sem-title { color: #1e8449; }
+  .semaforo.amarillo .sem-title { color: #b7770d; }
+  .semaforo.rojo .sem-title { color: #922b21; }
+  .sem-body { font-size: 13px; color: #555; line-height: 1.6; }
+  .cta-box {
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+  .cta-box p { font-size: 14px; color: #ccc; margin-bottom: 14px; line-height: 1.6; }
+  .btn-cta {
+    display: inline-block; padding: 11px 28px;
+    background: #ffffff; color: #1a1a1a;
+    border-radius: 8px; font-size: 14px;
+    font-weight: 600; text-decoration: none;
+    cursor: pointer; border: none;
+    font-family: 'Inter', sans-serif;
+  }
+  .footer {
+    text-align: center; margin-top: 1.5rem;
+    font-size: 12px; color: #aaa;
+  }
+  @media (max-width: 480px) {
+    .card { padding: 1.25rem; }
+    .row2 { grid-template-columns: 1fr; }
+    .metrics-grid { grid-template-columns: 1fr; }
+    h1 { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-bar">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+      </svg>
+    </div>
+    <span class="logo-text">Restaurantes Exitosos</span>
+  </div>
+
+  <h1>¿Tu plato estrella te deja ganancias o pérdidas?</h1>
+  <p class="subtitle">Ingresa los datos de un solo plato y descubre su rentabilidad real en menos de 2 minutos.</p>
+
+  <div class="sec-label">Precio y ventas</div>
+  <div class="row2">
+    <div class="field">
+      <label for="precio">Precio de venta</label>
+      <div class="iw has-pre"><span class="pre">$</span><input type="number" id="precio" placeholder="0.00" min="0" step="0.01"></div>
+      <span class="err" id="err-precio">Ingresa el precio de venta</span>
+    </div>
+    <div class="field">
+      <label for="porciones">Porciones que vende al mes</label>
+      <input type="number" id="porciones" placeholder="0" min="0" step="1">
+      <span class="err" id="err-porciones">Ingresa las porciones mensuales</span>
+    </div>
+  </div>
+
+  <div class="sec-label">Costos del plato (por porción)</div>
+  <div class="row2">
+    <div class="field">
+      <label for="ingredientes">Costo de ingredientes</label>
+      <div class="iw has-pre"><span class="pre">$</span><input type="number" id="ingredientes" placeholder="0.00" min="0" step="0.01"></div>
+      <span class="err" id="err-ingredientes">Ingresa el costo de ingredientes</span>
+    </div>
+    <div class="field">
+      <label for="merma">% de merma estimada</label>
+      <div class="iw has-suf"><input type="number" id="merma" placeholder="0" min="0" max="100" step="1"><span class="suf">%</span></div>
+      <span class="field-hint">Pérdida por corte, cocción, limpieza</span>
+    </div>
+  </div>
+  <div class="row2">
+    <div class="field">
+      <label for="manodeobra">Mano de obra</label>
+      <div class="iw has-pre"><span class="pre">$</span><input type="number" id="manodeobra" placeholder="0.00" min="0" step="0.01"></div>
+      <span class="field-hint">Costo del cocinero por porción</span>
+    </div>
+    <div class="field">
+      <label for="operacional">Gastos operacionales</label>
+      <div class="iw has-pre"><span class="pre">$</span><input type="number" id="operacional" placeholder="0.00" min="0" step="0.01"></div>
+      <span class="field-hint">Renta, servicios, otros (por porción)</span>
+    </div>
+  </div>
+
+  <button class="btn-calc" onclick="calcular()">Calcular rentabilidad</button>
+
+  <div class="results" id="results">
+    <div class="sec-label" style="margin-top:1.75rem">Desglose de costos</div>
+    <div class="breakdown">
+      <div class="bd-title">Costo real por porción</div>
+      <div class="bd-row"><span>Ingredientes</span><span id="bd-ing">$0.00</span></div>
+      <div class="bd-row"><span>Ajuste por merma</span><span id="bd-merma">$0.00</span></div>
+      <div class="bd-row"><span>Mano de obra</span><span id="bd-mano">$0.00</span></div>
+      <div class="bd-row"><span>Gastos operacionales</span><span id="bd-op">$0.00</span></div>
+      <div class="bd-row total"><span>Costo real total</span><span id="bd-total">$0.00</span></div>
+    </div>
+
+    <div class="sec-label">Resultado</div>
+    <div class="metrics-grid">
+      <div class="metric">
+        <div class="metric-label">Food Cost %</div>
+        <div class="metric-value" id="m-fc">0%</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Ganancia por porción</div>
+        <div class="metric-value" id="m-gpp">$0.00</div>
+      </div>
+      <div class="metric" style="grid-column:1/-1">
+        <div class="metric-label">Ganancia o pérdida proyectada al mes</div>
+        <div class="metric-value" id="m-mes">$0.00</div>
+      </div>
+    </div>
+
+    <div class="semaforo" id="semaforo">
+      <div class="sem-title" id="sem-title"></div>
+      <div class="sem-body" id="sem-body"></div>
+    </div>
+
+    <div class="cta-box">
+      <p id="cta-text"></p>
+      <a class="btn-cta" href="https://instagram.com" target="_blank">Ver cómo mejorar mis números →</a>
+    </div>
+  </div>
+
+  <div class="footer">Recurso gratuito de Restaurantes Exitosos</div>
+</div>
+
+<script>
+function fmt(n){return '$'+Math.abs(n).toLocaleString('es',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function pct(n){return Math.round(n)+'%'}
+
+function calcular(){
+  const campos=['precio','ingredientes','porciones'];
+  let valido=true;
+  campos.forEach(id=>{
+    const el=document.getElementById(id);
+    const err=document.getElementById('err-'+id);
+    const val=parseFloat(el.value);
+    if(!el.value||isNaN(val)||val<=0){err.style.display='block';valido=false;}
+    else{err.style.display='none';}
+  });
+  if(!valido)return;
+
+  const precio=parseFloat(document.getElementById('precio').value)||0;
+  const ingredientes=parseFloat(document.getElementById('ingredientes').value)||0;
+  const mermaPct=parseFloat(document.getElementById('merma').value)||0;
+  const mano=parseFloat(document.getElementById('manodeobra').value)||0;
+  const op=parseFloat(document.getElementById('operacional').value)||0;
+  const porciones=parseFloat(document.getElementById('porciones').value)||0;
+
+  const ajusteMerma=ingredientes*(mermaPct/100);
+  const costoTotal=ingredientes+ajusteMerma+mano+op;
+  const foodCost=(costoTotal/precio)*100;
+  const gananciaUni=precio-costoTotal;
+  const gananciaMes=gananciaUni*porciones;
+
+  document.getElementById('bd-ing').textContent=fmt(ingredientes);
+  document.getElementById('bd-merma').textContent=fmt(ajusteMerma);
+  document.getElementById('bd-mano').textContent=fmt(mano);
+  document.getElementById('bd-op').textContent=fmt(op);
+  document.getElementById('bd-total').textContent=fmt(costoTotal);
+
+  const fcEl=document.getElementById('m-fc');
+  const gppEl=document.getElementById('m-gpp');
+  const mesEl=document.getElementById('m-mes');
+  fcEl.textContent=pct(foodCost);
+  gppEl.textContent=(gananciaUni>=0?'+':'-')+fmt(gananciaUni);
+  mesEl.textContent=(gananciaMes>=0?'+':'-')+fmt(gananciaMes);
+
+  const cls=foodCost<=34?'verde':foodCost<=45?'amarillo':'rojo';
+  fcEl.className='metric-value '+cls;
+  gppEl.className='metric-value '+cls;
+  mesEl.className='metric-value '+cls;
+
+  const sem=document.getElementById('semaforo');
+  const semT=document.getElementById('sem-title');
+  const semB=document.getElementById('sem-body');
+  const cta=document.getElementById('cta-text');
+  sem.className='semaforo';
+
+  if(foodCost<=34){
+    sem.classList.add('verde');
+    semT.textContent='Tu plato está en zona saludable';
+    semB.textContent='Tu food cost está dentro del rango recomendado (hasta 34%). Aun así, hay estrategias para maximizar aún más tu margen y diseñar promociones que disparen tus ventas.';
+    cta.textContent='Bien encaminado. Aprende a llevar todos tus platos a este nivel y a crear promociones que aumenten tus utilidades sin sacrificar rentabilidad.';
+  } else if(foodCost<=45){
+    sem.classList.add('amarillo');
+    semT.textContent='Zona de alerta: tu margen está comprimido';
+    semB.textContent='Tu food cost supera el 34% recomendado. Estás cubriendo costos pero con poco margen de maniobra. Pequeños cambios en ingredientes, merma o precio pueden hacer una gran diferencia.';
+    cta.textContent='Con las herramientas correctas puedes ajustar precios, reducir merma y aumentar tu utilidad real sin perder clientes.';
+  } else {
+    sem.classList.add('rojo');
+    semT.textContent='Zona crítica: este plato puede estar generando pérdidas';
+    semB.textContent='Tu food cost supera el 45%. Cada porción que vendes puede estar costándote más de lo que recibes. Este es exactamente el problema que lleva a muchos restaurantes a cerrar sin entender por qué.';
+    cta.textContent='No tienes que adivinarlo. Aprende a calcular el precio correcto de cada plato, controlar la merma y aumentar tus utilidades con un método probado.';
+  }
+
+  document.getElementById('results').style.display='block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+</body>
+</html>
