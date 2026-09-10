@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha técnica de costeo por plato</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f5f5f0;
+    color: #1a1a1a;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+  .card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 680px;
+    margin: 0 auto;
+    border: 1px solid #e5e5e0;
+  }
+  .logo-bar {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 1.5rem; padding-bottom: 1rem;
+    border-bottom: 1px solid #f0f0eb;
+  }
+  .logo-icon {
+    width: 36px; height: 36px; background: #1a1a1a;
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  }
+  .logo-icon svg { width: 20px; height: 20px; fill: #ffffff; }
+  .logo-text { font-size: 13px; font-weight: 500; color: #666; }
+  h1 { font-size: 20px; font-weight: 600; color: #1a1a1a; margin-bottom: 6px; line-height: 1.3; }
+  .subtitle { font-size: 14px; color: #666; margin-bottom: 1.75rem; line-height: 1.5; }
+  .sec-label {
+    font-size: 11px; font-weight: 600; color: #999;
+    letter-spacing: .07em; text-transform: uppercase;
+    margin: 1.25rem 0 .75rem;
+  }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 13px; font-weight: 500; color: #444; }
+  .field-hint { font-size: 11px; color: #999; }
+  .iw { position: relative; }
+  .iw .pre { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #999; pointer-events: none; }
+  .iw .suf { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #999; pointer-events: none; }
+  input[type="number"], input[type="text"], select {
+    width: 100%; height: 40px;
+    border: 1px solid #e0e0db; border-radius: 8px;
+    font-size: 14px; color: #1a1a1a; background: #fafafa;
+    padding: 0 12px; transition: border-color .15s;
+    font-family: 'Inter', sans-serif;
+  }
+  input:focus, select:focus { outline: none; border-color: #1a1a1a; background: #fff; }
+  .iw.has-pre input { padding-left: 24px; }
+  .iw.has-suf input { padding-right: 30px; }
+  .err { font-size: 12px; color: #c0392b; margin-top: 3px; display: none; }
+  .ing-wrap { overflow-x: auto; margin-bottom: 10px; }
+  table { width: 100%; border-collapse: collapse; min-width: 560px; }
+  thead th {
+    font-size: 11px; font-weight: 600; color: #999;
+    text-align: left; padding: 0 6px 8px;
+    border-bottom: 1px solid #e0e0db;
+    letter-spacing: .04em; text-transform: uppercase;
+  }
+  tbody td { padding: 6px; border-bottom: 1px solid #f0f0eb; vertical-align: middle; }
+  tbody td input, tbody td select {
+    height: 34px; font-size: 12px; padding: 0 8px;
+    border-radius: 6px;
+  }
+  .td-sub { text-align: right; font-size: 12px; color: #666; min-width: 60px; white-space: nowrap; }
+  .btn-del {
+    background: none; border: none; cursor: pointer;
+    color: #bbb; padding: 4px; border-radius: 4px;
+    font-size: 18px; line-height: 1; display: flex; align-items: center;
+  }
+  .btn-del:hover { color: #c0392b; }
+  .btn-add {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: #1a1a1a;
+    background: none; border: 1px solid #e0e0db;
+    border-radius: 8px; padding: 8px 16px;
+    cursor: pointer; margin-bottom: 1rem;
+    font-family: 'Inter', sans-serif;
+    transition: background .15s;
+  }
+  .btn-add:hover { background: #f8f8f5; }
+  .btn-calc {
+    width: 100%; padding: 13px;
+    font-size: 15px; font-weight: 600;
+    margin-top: .5rem; cursor: pointer;
+    background: #1a1a1a; color: #ffffff;
+    border: none; border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    transition: opacity .15s;
+  }
+  .btn-calc:hover { opacity: .85; }
+  .results { margin-top: 1.75rem; display: none; }
+  .breakdown {
+    background: #f8f8f5; border-radius: 10px;
+    padding: 16px; margin-bottom: 1rem;
+    border: 1px solid #ececeb;
+  }
+  .bd-title { font-size: 13px; font-weight: 600; color: #444; margin-bottom: 10px; }
+  .bd-row { display: flex; justify-content: space-between; font-size: 13px; color: #666; padding: 3px 0; }
+  .bd-row.sub { padding-left: 12px; font-size: 12px; }
+  .bd-row.total {
+    border-top: 1px solid #e0e0db; margin-top: 8px; padding-top: 10px;
+    font-weight: 600; color: #1a1a1a; font-size: 14px;
+  }
+  .badge {
+    display: inline-block; font-size: 10px; font-weight: 600;
+    padding: 2px 7px; border-radius: 20px; margin-left: 6px;
+    background: #fef9e7; color: #b7770d; border: 1px solid #f9e79f;
+  }
+  .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+  .metric { background: #f8f8f5; border-radius: 10px; padding: 14px 16px; border: 1px solid #ececeb; }
+  .metric-label { font-size: 12px; color: #888; margin-bottom: 4px; }
+  .metric-value { font-size: 24px; font-weight: 600; color: #1a1a1a; }
+  .metric-value.verde { color: #27ae60; }
+  .metric-value.amarillo { color: #e67e22; }
+  .metric-value.rojo { color: #c0392b; }
+  .semaforo { border-radius: 12px; padding: 18px 20px; margin-bottom: 1rem; }
+  .semaforo.verde { background: #eafaf1; border: 1px solid #a9dfbf; }
+  .semaforo.amarillo { background: #fef9e7; border: 1px solid #f9e79f; }
+  .semaforo.rojo { background: #fdedec; border: 1px solid #f5b7b1; }
+  .sem-title { font-size: 15px; font-weight: 600; margin-bottom: 5px; }
+  .semaforo.verde .sem-title { color: #1e8449; }
+  .semaforo.amarillo .sem-title { color: #b7770d; }
+  .semaforo.rojo .sem-title { color: #922b21; }
+  .sem-body { font-size: 13px; color: #555; line-height: 1.6; }
+  .cta-box { background: #1a1a1a; border-radius: 12px; padding: 20px; text-align: center; }
+  .cta-box p { font-size: 14px; color: #ccc; margin-bottom: 14px; line-height: 1.6; }
+  .btn-cta {
+    display: inline-block; padding: 11px 28px;
+    background: #ffffff; color: #1a1a1a;
+    border-radius: 8px; font-size: 14px; font-weight: 600;
+    text-decoration: none; cursor: pointer; border: none;
+    font-family: 'Inter', sans-serif;
+  }
+  .footer { text-align: center; margin-top: 1.5rem; font-size: 12px; color: #aaa; }
+  @media (max-width: 520px) {
+    .card { padding: 1.25rem; }
+    .row2 { grid-template-columns: 1fr; }
+    .metrics-grid { grid-template-columns: 1fr; }
+    h1 { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-bar">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+      </svg>
+    </div>
+    <span class="logo-text">Restaurantes Exitosos</span>
+  </div>
+
+  <h1>Ficha técnica de costeo por plato</h1>
+  <p class="subtitle">Registra cada ingrediente con su cantidad y costo real. La herramienta calcula automáticamente el costo total del plato incluyendo merma, mano de obra y gastos operacionales.</p>
+
+  <div class="sec-label">Datos del plato</div>
+  <div class="row2">
+    <div class="field">
+      <label for="nombre-plato">Nombre del plato</label>
+      <input type="text" id="nombre-plato" placeholder="Ej: Milanesa de pollo">
+      <span class="err" id="err-nombre">Ingresa el nombre del plato</span>
+    </div>
+    <div class="field">
+      <label for="precio-venta">Precio de venta</label>
+      <div class="iw has-pre"><span class="pre">$</span><input type="number" id="precio-venta" placeholder="0.00" min="0" step="0.01"></div>
+      <span class="err" id="err-precio">Ingresa el precio de venta</span>
+    </div>
+  </div>
+  <div class="row2">
+    <div class="field">
+      <label for="porciones-mes">Porciones que vende al mes</label>
+      <input type="number" id="porciones-mes" placeholder="0" min="0" step="1">
+      <span class="err" id="err-porciones">Ingresa las porciones mensuales</span>
+    </div>
+  </div>
+
+  <div class="sec-label">Ingredientes</div>
+  <div class="ing-wrap">
+    <table id="ing-table">
+      <thead>
+        <tr>
+          <th style="width:26%">Ingrediente</th>
+          <th style="width:13%">Cantidad</th>
+          <th style="width:12%">Unidad</th>
+          <th style="width:17%">Costo por kg/lt/u</th>
+          <th style="width:12%">% merma</th>
+          <th style="width:12%;text-align:right">Subtotal</th>
+          <th style="width:8%"></th>
+        </tr>
+      </thead>
+      <tbody id="ing-body"></tbody>
+    </table>
+  </div>
+  <button class="btn-add" onclick="agregarFila()">+ Agregar ingrediente</button>
+
+  <div class="sec-label">Costos adicionales por porción</div>
+  <div class="row2">
+    <div class="field">
+      <label for="mano">Mano de obra</label>
+      <div class="iw has-pre"><span class="pre">$</span><input type="number" id="mano" placeholder="0.00" min="0" step="0.01"></div>
+      <span class="field-hint">Costo del cocinero por porción</span>
+    </div>
+    <div class="field">
+      <label for="operacional">Gastos operacionales</label>
+      <div class="iw has-pre"><span class="pre">$</span><input type="number" id="operacional" placeholder="0.00" min="0" step="0.01"></div>
+      <span class="field-hint">Renta, servicios, otros (por porción)</span>
+    </div>
+  </div>
+
+  <button class="btn-calc" onclick="calcular()">Calcular costo real del plato</button>
+
+  <div class="results" id="results">
+    <div class="sec-label" style="margin-top:1.75rem">Desglose de costos</div>
+    <div class="breakdown">
+      <div class="bd-title">Costo real por porción</div>
+      <div class="bd-row" style="font-weight:600;color:#1a1a1a"><span>Ingredientes</span><span id="bd-ing-total">$0.00</span></div>
+      <div id="bd-ing-detalle"></div>
+      <div class="bd-row" style="margin-top:6px"><span>Mano de obra</span><span id="bd-mano">$0.00</span></div>
+      <div class="bd-row"><span>Gastos operacionales</span><span id="bd-op">$0.00</span></div>
+      <div class="bd-row total"><span>Costo real total</span><span id="bd-total">$0.00</span></div>
+    </div>
+
+    <div class="sec-label">Resultado</div>
+    <div class="metrics-grid">
+      <div class="metric">
+        <div class="metric-label">Food Cost %</div>
+        <div class="metric-value" id="m-fc">0%</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Ganancia por porción</div>
+        <div class="metric-value" id="m-gpp">$0.00</div>
+      </div>
+      <div class="metric" style="grid-column:1/-1">
+        <div class="metric-label">Proyección mensual</div>
+        <div class="metric-value" id="m-mes">$0.00</div>
+      </div>
+    </div>
+
+    <div class="semaforo" id="semaforo">
+      <div class="sem-title" id="sem-title"></div>
+      <div class="sem-body" id="sem-body"></div>
+    </div>
+
+    <div class="cta-box">
+      <p id="cta-text"></p>
+      <a class="btn-cta" href="https://instagram.com" target="_blank">Quiero mejorar mis números →</a>
+    </div>
+  </div>
+
+  <div class="footer">Recurso gratuito de Restaurantes Exitosos</div>
+</div>
+
+<script>
+let filas=0;
+const unidades=['g','kg','ml','lt','unidad'];
+function fmt(n){return '$'+Math.abs(n).toLocaleString('es',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function pct(n){return Math.round(n)+'%'}
+function gv(id){return parseFloat(document.getElementById(id)?.value)||0}
+function gs(id){return document.getElementById(id)?.value||''}
+
+function agregarFila(){
+  filas++;
+  const id=filas;
+  const tbody=document.getElementById('ing-body');
+  const tr=document.createElement('tr');
+  tr.id='fila-'+id;
+  const optsU=unidades.map(u=>`<option value="${u}">${u}</option>`).join('');
+  tr.innerHTML=`
+    <td><input type="text" placeholder="Nombre" id="n-${id}" oninput="af(${id})"></td>
+    <td><input type="number" placeholder="0" min="0" step="0.001" id="c-${id}" oninput="af(${id})"></td>
+    <td><select id="u-${id}" onchange="af(${id})">${optsU}</select></td>
+    <td><div class="iw has-pre"><span class="pre">$</span><input type="number" placeholder="0.00" min="0" step="0.01" id="p-${id}" oninput="af(${id})"></div></td>
+    <td><div class="iw has-suf"><input type="number" placeholder="0" min="0" max="100" step="1" id="m-${id}" oninput="af(${id})"><span class="suf">%</span></div></td>
+    <td class="td-sub" id="s-${id}">$0.00</td>
+    <td><button class="btn-del" onclick="eliminarFila(${id})" aria-label="Eliminar">✕</button></td>
+  `;
+  tbody.appendChild(tr);
+}
+
+function eliminarFila(id){
+  const el=document.getElementById('fila-'+id);
+  if(el)el.remove();
+}
+
+function costoFila(id){
+  const cant=gv('c-'+id);
+  const costoBase=gv('p-'+id);
+  const uni=gs('u-'+id);
+  const merma=gv('m-'+id)/100;
+  let costo=0;
+  if(uni==='g')costo=(cant/1000)*costoBase;
+  else if(uni==='ml')costo=(cant/1000)*costoBase;
+  else costo=cant*costoBase;
+  return costo+(costo*(merma/(1-merma||1)));
+}
+
+function af(id){
+  const s=document.getElementById('s-'+id);
+  if(s)s.textContent=fmt(costoFila(id));
+}
+
+function calcular(){
+  let valido=true;
+  [['nombre-plato','err-nombre',false],['precio-venta','err-precio',true],['porciones-mes','err-porciones',true]].forEach(([id,eid,num])=>{
+    const el=document.getElementById(id);
+    const err=document.getElementById(eid);
+    if(!el.value||(num&&(isNaN(parseFloat(el.value))||parseFloat(el.value)<=0))){
+      err.style.display='block';valido=false;
+    }else{err.style.display='none';}
+  });
+  if(!valido)return;
+
+  const precio=gv('precio-venta');
+  const porciones=gv('porciones-mes');
+  const mano=gv('mano');
+  const op=gv('operacional');
+  const nom=gs('nombre-plato')||'Tu plato';
+
+  let totalIng=0;
+  let detalleHTML='';
+  document.querySelectorAll('#ing-body tr').forEach(tr=>{
+    const fid=tr.id.replace('fila-','');
+    const n=gs('n-'+fid)||'Ingrediente';
+    const cant=gv('c-'+fid);
+    const uni=gs('u-'+fid);
+    const costoBase=gv('p-'+fid);
+    const merma=gv('m-'+fid);
+    if(cant>0&&costoBase>0){
+      const c=costoFila(fid);
+      totalIng+=c;
+      const badge=merma>0?`<span class="badge">${merma}% merma</span>`:'';
+      detalleHTML+=`<div class="bd-row sub"><span>${n} (${cant} ${uni})${badge}</span><span>${fmt(c)}</span></div>`;
+    }
+  });
+
+  const costoTotal=totalIng+mano+op;
+  const foodCost=precio>0?(costoTotal/precio)*100:0;
+  const gananciaUni=precio-costoTotal;
+  const gananciaMes=gananciaUni*porciones;
+
+  document.getElementById('bd-ing-total').textContent=fmt(totalIng);
+  document.getElementById('bd-ing-detalle').innerHTML=detalleHTML;
+  document.getElementById('bd-mano').textContent=fmt(mano);
+  document.getElementById('bd-op').textContent=fmt(op);
+  document.getElementById('bd-total').textContent=fmt(costoTotal);
+
+  const fcEl=document.getElementById('m-fc');
+  const gppEl=document.getElementById('m-gpp');
+  const mesEl=document.getElementById('m-mes');
+  fcEl.textContent=pct(foodCost);
+  gppEl.textContent=(gananciaUni>=0?'+':'-')+fmt(gananciaUni);
+  mesEl.textContent=(gananciaMes>=0?'+':'-')+fmt(gananciaMes);
+
+  const cls=foodCost<=34?'verde':foodCost<=45?'amarillo':'rojo';
+  [fcEl,gppEl,mesEl].forEach(el=>el.className='metric-value '+cls);
+
+  const sem=document.getElementById('semaforo');
+  sem.className='semaforo';
+  if(foodCost<=34){
+    sem.classList.add('verde');
+    document.getElementById('sem-title').textContent=nom+' está en zona saludable';
+    document.getElementById('sem-body').textContent='Tu food cost está dentro del rango recomendado (hasta 34%). Conoce las estrategias para maximizar el margen de todos tus platos.';
+    document.getElementById('cta-text').textContent='Con Administración Pro para Restaurantes aprenderás a optimizar toda tu carta y a crear promociones que aumenten tus utilidades sin sacrificar calidad.';
+  }else if(foodCost<=45){
+    sem.classList.add('amarillo');
+    document.getElementById('sem-title').textContent=nom+': zona de alerta';
+    document.getElementById('sem-body').textContent='Tu food cost supera el 34% recomendado. Pequeños ajustes en ingredientes, merma o precio pueden hacer una gran diferencia.';
+    document.getElementById('cta-text').textContent='Aprende a ajustar precios, reducir merma y aumentar tu utilidad real con un método probado para restaurantes.';
+  }else{
+    sem.classList.add('rojo');
+    document.getElementById('sem-title').textContent=nom+': zona crítica';
+    document.getElementById('sem-body').textContent='Tu food cost supera el 45%. Cada porción vendida puede estar costándote más de lo que recibes. Este es el problema silencioso que lleva a muchos restaurantes a cerrar.';
+    document.getElementById('cta-text').textContent='No tienes que seguir adivinando. Aprende a calcular el precio correcto, controlar la merma y aumentar tus utilidades con Administración Pro para Restaurantes.';
+  }
+
+  document.getElementById('results').style.display='block';
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+agregarFila();agregarFila();agregarFila();
+</script>
+</body>
+</html>
